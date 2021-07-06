@@ -3,13 +3,14 @@ import requests
 import sys
 import json
 import datetime
-from os.path import getmtime
+from os.path import getmtime, exists
 
 
 class Weather:
     def __init__(self):
         self.response = []
         self.forecast_data = {}
+        self.counter = 0
 
     def get_response(self, key):
         url = "https://visual-crossing-weather.p.rapidapi.com/forecast"
@@ -24,6 +25,11 @@ class Weather:
         self.response = requests.request("GET", url, headers=headers, params=querystring).json()
 
     def load_response(self, key, file):
+        if not exists(file):
+            self.get_response(key)
+            self.save_response(file)
+            return
+
         sec = getmtime(file)
         current = datetime.datetime.now().timestamp()
         if current - sec < 60 * 60 * 24:
@@ -53,17 +59,33 @@ class Weather:
         else:
             return "NIE BEDZIE PADAC."
 
+    def items(self):
+        return self.forecast_data.items()
+
+    def __iter__(self):
+        self.counter = 0
+        return self
+
+    def __next__(self):
+        if len(self.forecast_data) <= self.counter:
+            raise StopIteration
+        d = list(self.forecast_data)[self.counter]
+        self.counter += 1
+        return d
+
 
 weather = Weather()
 key = input()
 outfile = sys.argv[1]
-weather.get_response(key)
 weather.load_response(key, outfile)
 weather.forecast()
 
-if sys.argv[2]:
+if len(sys.argv) >= 3:
     print(weather[sys.argv[2]])
-if not sys.argv[2]:
+if len(sys.argv) < 3:
     x = datetime.date.today() + datetime.timedelta(days=1)
-    y = str(x)
+    y = x.strftime("%Y-%m-%d")
     print(weather[y])
+
+for d in weather:
+    print(d)
