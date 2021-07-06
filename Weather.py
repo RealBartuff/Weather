@@ -65,4 +65,5 @@ if sys.argv[2]:
     print(weather[sys.argv[2]])
 if not sys.argv[2]:
     x = datetime.date.today() + datetime.timedelta(days=1)
-    print(weather[x])
+    y = str(x)
+    print(weather[y])
