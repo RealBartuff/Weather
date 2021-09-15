@@ -1,4 +1,3 @@
-
 import requests
 import sys
 import json
@@ -15,14 +14,22 @@ class Weather:
     def get_response(self, key):
         url = "https://visual-crossing-weather.p.rapidapi.com/forecast"
 
-        querystring = {"location":"Krakow,Poland","aggregateHours":"24","shortColumnNames":"0","unitGroup":"metric","contentType":"json"}
+        querystring = {
+            "location": "Krakow,Poland",
+            "aggregateHours": "24",
+            "shortColumnNames": "0",
+            "unitGroup": "metric",
+            "contentType": "json",
+        }
 
         headers = {
-            'x-rapidapi-key': key,
-            'x-rapidapi-host': "visual-crossing-weather.p.rapidapi.com"
-            }
+            "x-rapidapi-key": key,
+            "x-rapidapi-host": "visual-crossing-weather.p.rapidapi.com",
+        }
 
-        self.response = requests.request("GET", url, headers=headers, params=querystring).json()
+        self.response = requests.request(
+            "GET", url, headers=headers, params=querystring
+        ).json()
 
     def load_response(self, key, file):
         if not exists(file):
@@ -47,7 +54,9 @@ class Weather:
 
     def forecast(self):
         for curr_val in self.response["locations"]["Krakow,Poland"]["values"]:
-            date = datetime.datetime.utcfromtimestamp(curr_val["datetime"] / 1000).strftime("%Y-%m-%d")
+            date = datetime.datetime.utcfromtimestamp(
+                curr_val["datetime"] / 1000
+            ).strftime("%Y-%m-%d")
             daily_forecast = curr_val["conditions"]
             self.forecast_data[date] = daily_forecast
 
